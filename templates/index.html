@@ -3,12 +3,22 @@
 <head>
     <script src="/static/script.js"></script>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="manifest" href="/static/manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Enable standalone (app-like) mode -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- Status bar style: default | black | black-translucent -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- App title on home screen -->
+    <meta name="apple-mobile-web-app-title" content="Remote">
+
     <title>Arch Remote</title>
 </head>
 <body>
-    <a href="/movies">
+    <a href="movies/">
         <button>Search</button>
     </a>
     <h1>Remote</h1>

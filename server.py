@@ -17,7 +17,7 @@ def focusFirefox():
 def index():
     return render_template("index.html")
 
-@app.route("/movies")
+@app.route("/movies/")
 def movies():
     return render_template("movies.html")
 
@@ -30,9 +30,12 @@ def searchTmdb():
     results = tmdbFinder.search(query)
     return jsonify({"results": results})
 
-@app.route("/select/<int:movieID>")
-def selectMovie(movieID):
-    subprocess.run(['firefox', '--new-tab', f'https://www.cineby.app/movie/{movieID}?play=true'])
+@app.route("/select/<mediaType>/<int:movieID>")
+def selectMovie(movieID, mediaType):
+    if mediaType == 'tv':
+        subprocess.run(['firefox', '--new-tab', f'https://www.cineby.app/tv/{movieID}/1/1?play=true'])
+    else:
+        subprocess.run(['firefox', '--new-tab', f'https://www.cineby.app/movie/{movieID}?play=true'])
     return "ok"
 
 @app.route("/press/<action>")

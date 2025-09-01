@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
       div.innerHTML = `
         <img src="${posterUrl}" alt=${movie.title} />
         <h3>${movie.title || movie.name}</h3>
-        <button data-id="${movie.id}">Select</button>
+        <button data-id="${movie.id}" data-type=${movie.media_type}>Select</button>
       `;
 
       resultsDiv.appendChild(div);
@@ -39,7 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("button[data-id]").forEach(button => {
       button.addEventListener("click", async () => {
         const movieId = button.dataset.id;
-        await fetch(`/select/${movieId}`);
+        const mediaType = button.dataset.type
+        await fetch(`/select/${mediaType}/${movieId}`);
       });
     });
   });

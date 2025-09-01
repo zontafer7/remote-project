@@ -5,7 +5,7 @@ class MovieFinder:
         self.apiKey = apiKey
         self.baseUrl = 'https://api.themoviedb.org/3'
 
-    def search(self, query, type='movie',page=1):
+    def search(self, query, type='multi',page=1):
         url = f"{self.baseUrl}/search/{type}"
         params = {
             "api_key": self.apiKey,
@@ -19,3 +19,10 @@ class MovieFinder:
             raise Exception(f"TMDB API Error: {response.status_code}")
         data = response.json()
         return data.get("results", [])
+
+    def getDetails(self, movieID):
+        url = f"{self.baseUrl}/movie/{movieID}"
+        params = {
+            "api_key" : self.apiKey,
+            "language": "en-US"
+        }
