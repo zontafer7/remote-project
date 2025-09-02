@@ -21,8 +21,14 @@
     <a href="movies/">
         <button>Search</button>
     </a>
+    <button onclick="sendKey('shutdown')">Shutdown</button>
     <h1>Remote</h1>
     <button onclick="sendKey('playpause')">Play/Pause</button>
     <button onclick="sendKey('fullscreen')">Fullscreen</button>
+    <button onclick="sendKey('nextEpisode')">Next Episode</button>
+    <div id="now-playing">
+        <h2>Now Playing</h2>
+        <div id="media-details">Nothing playing right now...</div>
+    </div>
 </body>
 </html>

@@ -20,9 +20,12 @@ class MovieFinder:
         data = response.json()
         return data.get("results", [])
 
-    def getDetails(self, movieID):
-        url = f"{self.baseUrl}/movie/{movieID}"
+    def getDetails(self, format, movieID):
+        url = f"{self.baseUrl}/{format}/{movieID}"
         params = {
             "api_key" : self.apiKey,
             "language": "en-US"
         }
+        response = requests.get(url, params=params)
+        data = response.json()
+        return data
