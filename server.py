@@ -17,12 +17,14 @@ tmdbApiKey = os.environ.get('TMDB_API_KEY')
 tmdbFinder = MovieFinder(tmdbApiKey)
 
 def focusFirefox():
-    subprocess.run(['hyprctl', 'dispatch', 'focuswindow', 'class:^(firefox)$'])
+    subprocess.run(['hyprctl', 'dispatch', 'focusmonitor', 'HDMI-A-1'])
+    #subprocess.run(['hyprctl', 'dispatch', 'focuswindow', 'class:^(firefox)$'])
 
 def hideCursor():
     subprocess.run(['hyprctl', 'dispatch', 'movefocus', 'l'])
 
 def urlSplitter(url:str):
+    global currentMedia
     url = url.split('?', 1)[0]
     url = url.split('://', 1)[1]
     url = url.split('/',1)[1]
@@ -38,29 +40,34 @@ def urlSplitter(url:str):
     if len(parts) >= 2:
         result['format'] = parts[0]
         result['id'] = parts[1]
+        currentMedia = {'format': result['format'], 'id': result['id']}
 
     if result['format'] == 'tv':
         result['season'] = parts[2]
         result['episode'] = parts[3]
+        currentMedia = {'format': result['format'], 'id': result['format'], 'season':result['season'], 'episode':result['episode']}
 
     return result
 
 def getCinebyUrl():
-    with open(session_file, "rb") as f:
-        data = f.read()
+    try:
+        with open(session_file, "rb") as f:
+            data = f.read()
 
 
-    decompressed = lz4.block.decompress(data[8:])
-    session = json.loads(decompressed)
+        decompressed = lz4.block.decompress(data[8:])
+        session = json.loads(decompressed)
 
-    for window in session["windows"]:
-        for tab in window["tabs"]:
-            i = tab["index"] - 1  # active entry
-            url = tab["entries"][i]["url"]
-            if 'cineby.app' in url:
-                return(urlSplitter(url))
+        for window in session["windows"]:
+            for tab in window["tabs"]:
+                i = tab["index"] - 1  # active entry
+                url = tab["entries"][i]["url"]
+                if 'cineby.app' in url:
+                    return(urlSplitter(url))
 
-    return None
+        return None
+    except:
+        return None
     
 @app.route("/")
 def index():
@@ -81,7 +88,10 @@ def searchTmdb():
 
 @app.route("/select/<mediaType>/<int:movieID>")
 def selectMovie(movieID, mediaType, season='1', episode='1'):
-    global currentMedia
+    focusFirefox()
+    current = getCinebyUrl()
+    if current:
+        press('closeTab')
     if mediaType == 'tv':
         subprocess.run(['firefox', '--new-tab', f'https://www.cineby.app/tv/{movieID}/{season}/{episode}?play=true'])
         currentMedia = {'format': mediaType, 'id': movieID, 'season': season, 'episode': episode}
@@ -103,13 +113,17 @@ def current():
 def press(action):
     if action == 'playpause':
         focusFirefox()
+        time.sleep(0.1)
         subprocess.run(['wtype', ' '])
         time.sleep(0.5)
         hideCursor()
 
     elif action == 'fullscreen':
         focusFirefox()
+        print('focused')
+        time.sleep(0.1)
         subprocess.run(['wtype', 'f'])
+        print('screened')
         time.sleep(0.5)
         hideCursor()
 
@@ -125,10 +139,13 @@ def press(action):
             currentEp = int(current['episode'])
             current['episode'] = str(currentEp+1)
             focusFirefox()
-            subprocess.run(['wtype', '-M', 'ctrl', 'w', '-m', 'ctrl'])
             selectMovie(current['id'], current['format'], current['season'], current['episode'])
         else:
             return 'not tv'
+
+    elif action == 'closeTab':
+        focusFirefox()
+        subprocess.run(['wtype', '-M', 'ctrl', 'w', '-m', 'ctrl'])
 
     return "working"
 
